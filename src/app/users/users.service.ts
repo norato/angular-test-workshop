@@ -3,28 +3,28 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 
-import { environment } from './../../environments/environment';
-import { Post } from './post.interface';
+import { environment } from '../../environments/environment';
+import { User } from './users.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PostService {
+export class UsersService {
   private readonly baseUrl = environment.baseUrl;
-  private readonly postsUrl = `${this.baseUrl}/posts`;
+  private readonly usersUrl = `${this.baseUrl}/users`;
 
-  private readonly entitiesPriv = new BehaviorSubject<Post[]>([]);
+  private readonly entitiesPriv = new BehaviorSubject<User[]>([]);
   entities$ = this.entitiesPriv.asObservable();
 
   constructor(private readonly httpClient: HttpClient) {}
 
-  private postUrl(id?: string) {
-    return `${this.postsUrl}/${id}`;
+  private userUrl(id?: string) {
+    return `${this.usersUrl}/${id}`;
   }
 
-  getPosts(): void {
+  getUsers(): void {
     this.httpClient
-      .get<Post[]>(this.postsUrl)
+      .get<User[]>(this.usersUrl)
       .pipe(
         tap((entities) => this.entitiesPriv.next(entities)),
         first()
@@ -32,8 +32,8 @@ export class PostService {
       .subscribe();
   }
 
-  deletePost(id: string): Observable<Post> {
-    const url = this.postUrl(id);
-    return this.httpClient.delete<Post>(url);
+  deleteUser(id: string): Observable<User> {
+    const url = this.userUrl(id);
+    return this.httpClient.delete<User>(url);
   }
 }

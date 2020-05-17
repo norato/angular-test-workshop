@@ -2,28 +2,29 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { filter, switchMap, tap } from 'rxjs/operators';
 
-import { PostService } from '../post.service';
-import { ConfirmationDialogComponent } from './../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { UsersService } from '../users.service';
 
 @Component({
-  selector: 'app-list-posts',
-  templateUrl: './list-posts.component.html',
-  styleUrls: ['./list-posts.component.scss'],
+  selector: 'app-list-users',
+  templateUrl: './list-users.component.html',
+  styleUrls: ['./list-users.component.scss'],
 })
-export class ListPostsComponent implements OnInit {
-  dataSource$ = this.postService.entities$;
+export class ListUsersComponent implements OnInit {
+  dataSource$ = this.usersService.entities$;
   columns = ['id', 'title'];
 
   constructor(
-    private readonly postService: PostService,
+    private readonly usersService: UsersService,
     public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    this.postService.getPosts();
+    this.usersService.getUsers();
   }
 
   tableActions(action) {
+    console.log('ListUsersComponent -> tableActions -> action', action);
     switch (action?.name) {
       case 'delete':
         this.deleteCallback(action);
@@ -32,15 +33,14 @@ export class ListPostsComponent implements OnInit {
       default:
         break;
     }
-    console.log('ListPostsComponent -> tableActions -> action', action);
   }
 
   deleteCallback(action) {
-    const postID = action?.row?.id;
+    const userID = action?.row?.id;
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '350px',
       data: {
-        message: `Do you want to delete the post id: ${postID}`,
+        message: `Do you want to delete the user id: ${userID}`,
       },
     });
 
@@ -48,9 +48,9 @@ export class ListPostsComponent implements OnInit {
       .afterClosed()
       .pipe(
         filter((result) => !!result),
-        switchMap(() => this.postService.deletePost(postID)),
+        switchMap(() => this.usersService.deleteUser(userID)),
         tap((it) => console.log('Tap -> :', it))
-        // tap(() => this.postService.getPosts())
+        // tap(() => this.usersService.getUsers())
       )
       .subscribe();
   }
