@@ -65,6 +65,7 @@ export class ListUsersComponent implements OnInit {
       .afterClosed()
       .pipe(
         filter((result) => !!result),
+        tap(() => this.spinner.show()),
         switchMap(() => this.usersService.deleteUser(userID)),
         tap(() => this.openSnackbar('User deleted successfully!')),
         tap(() => this.getUsers())
