@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 
 import { environment } from './../../environments/environment';
@@ -18,6 +18,10 @@ export class PostService {
 
   constructor(private readonly httpClient: HttpClient) {}
 
+  private postUrl(id?: string) {
+    return `${this.postsUrl}/${id}`;
+  }
+
   getPosts(): void {
     this.httpClient
       .get<Post[]>(this.postsUrl)
@@ -26,5 +30,10 @@ export class PostService {
         first()
       )
       .subscribe();
+  }
+
+  deletePost(id: string): Observable<Post> {
+    const url = this.postUrl(id);
+    return this.httpClient.delete<Post>(url);
   }
 }
