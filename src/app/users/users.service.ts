@@ -18,7 +18,7 @@ export class UsersService {
 
   constructor(private readonly httpClient: HttpClient) {}
 
-  private userUrl(id?: string) {
+  private userUrl(id?: string | number) {
     return `${this.usersUrl}/${id}`;
   }
 
@@ -33,8 +33,19 @@ export class UsersService {
       .subscribe();
   }
 
+  getUser(id: string): Observable<any> {
+    const url = this.userUrl(id);
+    return this.httpClient.get<User>(url).pipe(delay(2_000));
+  }
+
+  updateUser(user: User): Observable<any> {
+    const { id } = user;
+    const url = this.userUrl(id);
+    return this.httpClient.put<User>(url, user).pipe(delay(2_000));
+  }
+
   deleteUser(id: string): Observable<any> {
     const url = this.userUrl(id);
-    return this.httpClient.delete<User>(url);
+    return this.httpClient.delete<User>(url).pipe(delay(2_000));
   }
 }

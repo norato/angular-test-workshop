@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { SpinnerVisibilityService } from 'ng-http-loader';
 import { filter, pluck, switchMap, tap } from 'rxjs/operators';
 
@@ -24,7 +25,8 @@ export class ListUsersComponent implements OnInit {
     private readonly usersService: UsersService,
     private readonly dialog: MatDialog,
     private readonly snackBar: MatSnackBar,
-    private readonly spinner: SpinnerVisibilityService
+    private readonly spinner: SpinnerVisibilityService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +39,6 @@ export class ListUsersComponent implements OnInit {
   }
 
   tableActions(action) {
-    console.log('ListUsersComponent -> tableActions -> action', action);
     switch (action?.name) {
       case 'delete':
         this.deleteCallback(action);
@@ -45,7 +46,8 @@ export class ListUsersComponent implements OnInit {
       case 'view':
         this.viewCallback(action);
         break;
-      default:
+      case 'edit':
+        this.editCallback(action);
         break;
     }
   }
@@ -75,6 +77,11 @@ export class ListUsersComponent implements OnInit {
       width: '600px',
       data: action?.row,
     });
+  }
+
+  editCallback(action) {
+    const userID = action?.row?.id;
+    this.router.navigate(['users/', userID]);
   }
 
   openSnackbar(message: string) {
