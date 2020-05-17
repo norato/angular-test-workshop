@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { filter, switchMap, tap } from 'rxjs/operators';
+import { filter, pluck, switchMap, tap } from 'rxjs/operators';
 
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { UsersService } from '../users.service';
@@ -11,8 +11,8 @@ import { UsersService } from '../users.service';
   styleUrls: ['./list-users.component.scss'],
 })
 export class ListUsersComponent implements OnInit {
-  dataSource$ = this.usersService.entities$;
-  columns = ['id', 'title'];
+  dataSource$ = this.usersService.entities$.pipe(pluck('data'));
+  columns = ['id', 'email', 'first_name'];
 
   constructor(
     private readonly usersService: UsersService,
@@ -49,8 +49,8 @@ export class ListUsersComponent implements OnInit {
       .pipe(
         filter((result) => !!result),
         switchMap(() => this.usersService.deleteUser(userID)),
-        tap((it) => console.log('Tap -> :', it))
-        // tap(() => this.usersService.getUsers())
+        tap((it) => console.log('Tap -> :', it)),
+        tap(() => this.usersService.getUsers())
       )
       .subscribe();
   }
