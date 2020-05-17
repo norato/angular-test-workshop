@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { first, tap } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { delay, first, tap } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
 import { User, UsersResponse } from './users.interface';
@@ -13,9 +13,7 @@ export class UsersService {
   private readonly baseUrl = environment.baseUrl;
   private readonly usersUrl = `${this.baseUrl}/users`;
 
-  private readonly entitiesPriv = new BehaviorSubject<UsersResponse>(
-    {} as UsersResponse
-  );
+  private readonly entitiesPriv = new Subject<UsersResponse>();
   entities$ = this.entitiesPriv.asObservable();
 
   constructor(private readonly httpClient: HttpClient) {}
@@ -29,6 +27,7 @@ export class UsersService {
       .get<UsersResponse>(this.usersUrl)
       .pipe(
         tap((entities) => this.entitiesPriv.next(entities)),
+        delay(2_000),
         first()
       )
       .subscribe();
