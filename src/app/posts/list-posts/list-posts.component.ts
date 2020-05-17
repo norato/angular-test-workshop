@@ -1,30 +1,22 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTable } from '@angular/material/table';
-import { ListPostsDataSource, ListPostsItem } from './list-posts-datasource';
+import { Component, OnInit } from '@angular/core';
+
+import { PostService } from '../post.service';
 
 @Component({
   selector: 'app-list-posts',
   templateUrl: './list-posts.component.html',
-  styleUrls: ['./list-posts.component.scss']
+  styleUrls: ['./list-posts.component.scss'],
 })
-export class ListPostsComponent implements AfterViewInit, OnInit {
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatTable) table: MatTable<ListPostsItem>;
-  dataSource: ListPostsDataSource;
+export class ListPostsComponent implements OnInit {
+  dataSource$ = this.postService.entities$;
+  columns = ['id', 'title'];
 
-  /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['id', 'name'];
+  constructor(private readonly postService: PostService) {}
 
-  ngOnInit() {
-    this.dataSource = new ListPostsDataSource();
+  ngOnInit(): void {
+    this.postService.getPosts();
   }
-
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-    this.table.dataSource = this.dataSource;
+  tableActions(action) {
+    console.log('ListPostsComponent -> tableActions -> action', action);
   }
 }
