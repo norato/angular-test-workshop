@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
-import { User } from './users.interface';
+import { User, UsersResponse } from './users.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +13,9 @@ export class UsersService {
   private readonly baseUrl = environment.baseUrl;
   private readonly usersUrl = `${this.baseUrl}/users`;
 
-  private readonly entitiesPriv = new BehaviorSubject<User[]>([]);
+  private readonly entitiesPriv = new BehaviorSubject<UsersResponse>(
+    {} as UsersResponse
+  );
   entities$ = this.entitiesPriv.asObservable();
 
   constructor(private readonly httpClient: HttpClient) {}
@@ -24,7 +26,7 @@ export class UsersService {
 
   getUsers(): void {
     this.httpClient
-      .get<User[]>(this.usersUrl)
+      .get<UsersResponse>(this.usersUrl)
       .pipe(
         tap((entities) => this.entitiesPriv.next(entities)),
         first()
@@ -32,7 +34,7 @@ export class UsersService {
       .subscribe();
   }
 
-  deleteUser(id: string): Observable<User> {
+  deleteUser(id: string): Observable<any> {
     const url = this.userUrl(id);
     return this.httpClient.delete<User>(url);
   }
