@@ -6,6 +6,7 @@ import { filter, pluck, switchMap, tap } from 'rxjs/operators';
 
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { UsersService } from '../users.service';
+import { UserViewComponent } from './../user-view/user-view.component';
 
 @Component({
   selector: 'app-list-users',
@@ -41,6 +42,9 @@ export class ListUsersComponent implements OnInit {
       case 'delete':
         this.deleteCallback(action);
         break;
+      case 'view':
+        this.viewCallback(action);
+        break;
       default:
         break;
     }
@@ -64,6 +68,13 @@ export class ListUsersComponent implements OnInit {
         tap(() => this.getUsers())
       )
       .subscribe();
+  }
+
+  viewCallback(action) {
+    this.dialog.open(UserViewComponent, {
+      width: '600px',
+      data: action?.row,
+    });
   }
 
   openSnackbar(message: string) {
