@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { SpinnerVisibilityService } from 'ng-http-loader';
-import { filter, pluck, switchMap, tap } from 'rxjs/operators';
+import { filter, pluck, tap } from 'rxjs/operators';
 
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { UsersService } from '../users.service';
@@ -66,7 +66,7 @@ export class ListUsersComponent implements OnInit {
       .pipe(
         filter((result) => !!result),
         tap(() => this.spinner.show()),
-        switchMap(() => this.usersService.deleteUser(userID)),
+        tap(() => this.usersService.getUser(userID)),
         tap(() => this.openSnackbar('User deleted successfully!')),
         tap(() => this.getUsers())
       )

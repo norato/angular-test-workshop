@@ -1,34 +1,127 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { SpinnerVisibilityService } from 'ng-http-loader';
+import { MockService } from 'ng-mocks';
+import { of } from 'rxjs';
 
+import { MatDialogMock, MatSnackBarMock } from './../../material/material.mocks';
+import { UsersService } from './../users.service';
 import { ListUsersComponent } from './list-users.component';
+
+class UsersServiceMockClass {
+  entities$ = of([]);
+  getUsers() {}
+}
+
+const UsersServiceMockValue = {
+  entities$: of([]),
+  getUsers: () => {},
+};
 
 describe('ListUsersComponent', () => {
   let component: ListUsersComponent;
   let fixture: ComponentFixture<ListUsersComponent>;
+  let usersService: UsersService;
+  let dialog: MatDialog;
+  let snackBar: MatSnackBar;
+  let spinner: SpinnerVisibilityService;
+  let router: Router;
+
+  const id = '1';
+  const action = { row: { id } };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ListUsersComponent],
       imports: [
-        NoopAnimationsModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatTableModule,
+        RouterTestingModule.withRoutes([{ path: 'users/:id', children: [] }]),
       ],
+      declarations: [ListUsersComponent],
+      providers: [
+        {
+          provide: UsersService,
+          useValue: UsersServiceMockValue,
+        },
+        MatDialogMock,
+        MatSnackBarMock,
+        {
+          provide: SpinnerVisibilityService,
+          useValue: MockService(SpinnerVisibilityService),
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ListUsersComponent);
+    spinner = TestBed.inject(SpinnerVisibilityService);
+    usersService = TestBed.inject(UsersService);
+    router = TestBed.inject(Router);
+    dialog = TestBed.inject(MatDialog);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should compile', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('OnInit', () => {
+    it('should call .getUsers', () => {
+      const spied = jest.spyOn(component, 'getUsers');
+      component.ngOnInit();
+      expect(spied).toHaveBeenCalled();
+    });
+
+    describe('should .getUsers call', () => {
+      it('should spinner.show', () => {
+        jest.spyOn(spinner, 'show');
+        component.getUsers();
+        expect(spinner.show).toHaveBeenCalled();
+      });
+      it('should usersService.getUsers', () => {
+        jest.spyOn(usersService, 'getUsers');
+        component.getUsers();
+        expect(usersService.getUsers).toHaveBeenCalled();
+      });
+    });
+  });
+
+  it('.editCallback', () => {
+    fixture.ngZone.run(() => {
+      jest.spyOn(router, 'navigate');
+
+      component.editCallback(action);
+      expect(router.navigate).toHaveBeenCalledWith(['users/', id]);
+    });
+  });
+
+  describe('.deleteCallback dialog.open should have the .afterClosed()', () => {
+    beforeEach(() => {
+      jest.spyOn(spinner, 'show');
+      const mockDialogResponse: any = {
+        afterClosed: jest.fn(() => of(true)),
+      };
+      jest.spyOn(dialog, 'open').mockReturnValue(mockDialogResponse);
+    });
+
+    it('should call spinner.show', () => {
+      component.deleteCallback(action);
+
+      fixture.whenStable();
+      expect(spinner.show).toHaveBeenCalled();
+    });
+    it('should usersService.getUser', () => {
+      jest.spyOn(usersService, 'getUser');
+
+      component.deleteCallback(action);
+
+      // fixture.whenStable();
+      // expect(usersService.deleteUser).toHaveBeenCalledWith(id);
+    });
   });
 });

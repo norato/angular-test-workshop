@@ -6653,6 +6653,11 @@ ng-http-loader@^7.0.0:
   resolved "https://registry.yarnpkg.com/ng-http-loader/-/ng-http-loader-7.0.0.tgz#6ebc6a68bba3728c4dda37871288b796e9d68ff9"
   integrity sha512-By9boXQ9BQbJvIty9bCrisbr6KXEnSSmXM+CQxnGQJXmGJ5W4NkSnoMK1YKzQnSK167OYRJyAUXMJ8wueaU/Ng==
 
+ng-mocks@^9.6.3:
+  version "9.6.3"
+  resolved "https://registry.yarnpkg.com/ng-mocks/-/ng-mocks-9.6.3.tgz#f41d26a71aacf301bfa5b2a049867f87c83199d6"
+  integrity sha512-557MgHNdJk9RAtOwUgzRaoeaKXBM+O1s84gPS/ghvWz1bsckEClTTVVODot4pu2mL80DCpesRxuASGs22PL6ow==
+
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
