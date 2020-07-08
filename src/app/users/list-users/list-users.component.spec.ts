@@ -5,9 +5,11 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpinnerVisibilityService } from 'ng-http-loader';
 import { MockService } from 'ng-mocks';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
 
-import { UsersServiceMock } from '../users.service-mock';
+import { User } from '../users.interface';
+import { UsersServiceMock, UsersServiceMockEntitiesSubject } from '../users.service-mock';
 import { MatDialogMock, MatSnackBarMock } from './../../material/material.mocks';
 import { UsersService } from './../users.service';
 import { ListUsersComponent } from './list-users.component';
@@ -148,6 +150,53 @@ describe('ListUsersComponent', () => {
         fixture.whenStable();
         expect(component.getUsers).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('dataSource$', () => {
+    const expected: User[] = [
+      {
+        id: 11324,
+        email: 'string',
+      },
+    ];
+    const httpResponse = {
+      data: expected,
+    };
+
+    let destroy$;
+
+    beforeEach(() => {
+      destroy$ = new Subject();
+    });
+    afterEach(() => {
+      destroy$.next();
+      destroy$.complete();
+    });
+
+    it('should map the correct response', () => {
+      UsersServiceMockEntitiesSubject.next(httpResponse);
+      component.dataSource$
+        .pipe(
+          takeUntil(destroy$),
+          tap((response) => {
+            expect(response).toEqual(expected);
+          })
+        )
+        .subscribe();
+    });
+
+    it('should call spinner', () => {
+      jest.spyOn(spinner, 'hide');
+      UsersServiceMockEntitiesSubject.next(httpResponse);
+      component.dataSource$
+        .pipe(
+          takeUntil(destroy$),
+          tap((response) => {
+            expect(spinner.hide).toHaveBeenCalled();
+          })
+        )
+        .subscribe();
     });
   });
 });
