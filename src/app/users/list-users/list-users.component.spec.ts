@@ -1,33 +1,22 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpinnerVisibilityService } from 'ng-http-loader';
 import { MockService } from 'ng-mocks';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
+import { UsersServiceMock } from '../users.service-mock';
 import { MatDialogMock, MatSnackBarMock } from './../../material/material.mocks';
 import { UsersService } from './../users.service';
 import { ListUsersComponent } from './list-users.component';
-
-class UsersServiceMockClass {
-  entities$ = of([]);
-  getUsers() {}
-}
-
-const UsersServiceMockValue = {
-  entities$: of([]),
-  getUsers: () => {},
-};
 
 describe('ListUsersComponent', () => {
   let component: ListUsersComponent;
   let fixture: ComponentFixture<ListUsersComponent>;
   let usersService: UsersService;
   let dialog: MatDialog;
-  let snackBar: MatSnackBar;
   let spinner: SpinnerVisibilityService;
   let router: Router;
 
@@ -43,7 +32,7 @@ describe('ListUsersComponent', () => {
       providers: [
         {
           provide: UsersService,
-          useValue: UsersServiceMockValue,
+          useValue: UsersServiceMock,
         },
         MatDialogMock,
         MatSnackBarMock,
@@ -84,7 +73,6 @@ describe('ListUsersComponent', () => {
         expect(spinner.show).toHaveBeenCalled();
       });
       it('should usersService.getUsers', () => {
-        jest.spyOn(usersService, 'getUsers');
         component.getUsers();
         expect(usersService.getUsers).toHaveBeenCalled();
       });
@@ -107,6 +95,8 @@ describe('ListUsersComponent', () => {
         afterClosed: jest.fn(() => of(true)),
       };
       jest.spyOn(dialog, 'open').mockReturnValue(mockDialogResponse);
+      jest.spyOn(component, 'openSnackbar');
+      jest.spyOn(component, 'getUsers');
     });
 
     it('should call spinner.show', () => {
@@ -115,13 +105,49 @@ describe('ListUsersComponent', () => {
       fixture.whenStable();
       expect(spinner.show).toHaveBeenCalled();
     });
-    it('should usersService.getUser', () => {
-      jest.spyOn(usersService, 'getUser');
-
+    it('should usersService.deleteUser', () => {
       component.deleteCallback(action);
 
-      // fixture.whenStable();
-      // expect(usersService.deleteUser).toHaveBeenCalledWith(id);
+      fixture.whenStable();
+      expect(usersService.deleteUser).toHaveBeenCalledWith(id);
+    });
+
+    describe('on deleteUser success', () => {
+      it('should openSnackbar', () => {
+        component.deleteCallback(action);
+
+        fixture.whenStable();
+        expect(component.openSnackbar).toHaveBeenCalled();
+      });
+
+      it('should getUsers', () => {
+        component.deleteCallback(action);
+
+        fixture.whenStable();
+        expect(component.getUsers).toHaveBeenCalled();
+      });
+    });
+
+    describe('on deleteUser fail', () => {
+      beforeEach(() => {
+        jest
+          .spyOn(usersService, 'deleteUser')
+          .mockReturnValue(throwError('faio'));
+      });
+
+      it('should not calll openSnackbar', () => {
+        component.deleteCallback(action);
+
+        fixture.whenStable();
+        expect(component.openSnackbar).not.toHaveBeenCalled();
+      });
+
+      it('should not calll getUsers', () => {
+        component.deleteCallback(action);
+
+        fixture.whenStable();
+        expect(component.getUsers).not.toHaveBeenCalled();
+      });
     });
   });
 });
