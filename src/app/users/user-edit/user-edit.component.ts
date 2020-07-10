@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SpinnerVisibilityService } from 'ng-http-loader';
 import { Subject } from 'rxjs';
-import { pluck, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { pluck, switchMap, takeUntil, tap, filter } from 'rxjs/operators';
 
 import { UsersService } from '../users.service';
 
@@ -44,6 +44,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         pluck('id'),
         switchMap((id) => this.usersService.getUser(id)),
+        filter((response)=> {
+          return Object(response).hasOwnProperty('data');
+        }),
         pluck('data'),
         tap((user) => this.form.setValue(user)),
         tap(() => this.spinner.hide())

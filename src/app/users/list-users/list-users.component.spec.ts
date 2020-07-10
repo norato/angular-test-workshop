@@ -199,4 +199,45 @@ describe('ListUsersComponent', () => {
         .subscribe();
     });
   });
+
+  describe('.tableActions', ()=> {
+    it('should call deleteCallback', ()=> {
+      const spydeleteCallback = jest.spyOn(component, 'deleteCallback');
+      const actionDeleteCallback = {name: 'delete'};
+
+      component.tableActions(actionDeleteCallback);
+
+      expect(spydeleteCallback).toHaveBeenCalled();
+
+    });
+
+    it('should call viewCallback', ()=> {
+      const spyviewCallback = jest.spyOn(component, 'viewCallback');
+      const actionViewCallback = {name: 'view'};
+
+      component.tableActions(actionViewCallback);
+
+      expect(spyviewCallback).toHaveBeenCalled();
+
+    });
+
+    it('should call editCallback', ()=> {
+      const spyeditCallback = jest.spyOn(component, 'editCallback').mockImplementation(()=> {});
+      const actionEditCallback = {name: 'edit'};
+
+      component.tableActions(actionEditCallback);
+
+      expect(spyeditCallback).toHaveBeenCalled();
+
+    });
+  });
+
+  it('viewCallback .dialog open ', () => {
+      const spyDialog = jest.spyOn(dialog, 'open');
+
+      component.viewCallback(action);
+      
+      expect(spyDialog).toHaveBeenCalled();
+  });
+  
 });
