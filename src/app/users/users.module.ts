@@ -12,21 +12,20 @@ import { UserViewComponent } from './user-view/user-view.component';
 import { UsersRoutingModule } from './users-routing.module';
 
 @NgModule({
-  declarations: [
-    UsersComponent,
-    ListUsersComponent,
-    UserViewComponent,
-    UserEditComponent,
-  ],
-  imports: [
-    CommonModule,
-    UsersRoutingModule,
-    SharedModule,
-    MaterialModule,
-    NgHttpLoaderModule.forRoot(),
-    FormsModule,
-    ReactiveFormsModule,
-  ],
-  entryComponents: [UserViewComponent],
+    declarations: [
+        UsersComponent,
+        ListUsersComponent,
+        UserViewComponent,
+        UserEditComponent,
+    ],
+    imports: [
+        CommonModule,
+        UsersRoutingModule,
+        SharedModule,
+        MaterialModule,
+        NgHttpLoaderModule.forRoot(),
+        FormsModule,
+        ReactiveFormsModule,
+    ]
 })
 export class UsersModule {}
